@@ -1,0 +1,33 @@
+{
+  "name": "lines-of-code-counter",
+  "version": "1.0.0",
+  "description": "Counts how many lines of codes are there in a given project.",
+  "main": "index.js",
+  "dependencies": {
+    "chai": "^4.1.0",
+    "nodemon": "^1.11.0"
+  },
+  "devDependencies": {
+    "mocha": "^3.4.2"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/victor-iyiola/lines-of-code-counter.git"
+  },
+  "keywords": [
+    "lines",
+    "code",
+    "counter",
+    "lines of code",
+    "lines of code counter"
+  ],
+  "author": "Victor I. Afolabi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/victor-iyiola/lines-of-code-counter/issues"
+  },
+  "homepage": "https://github.com/victor-iyiola/lines-of-code-counter#readme"
+}
