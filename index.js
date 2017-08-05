@@ -2,30 +2,27 @@ const path = require('path'),
   fs = require('fs');
 
 const projectDir = '/Users/victor/Documents/Devcrib/DigiSchools/desktop/digischools-desktop';
-const ignored_files = ['package-lock.json', 'font-awesome.min.js', 'font-awesome.css',
-    'bootstrap-grid.min.css', 'bootstrap.css', 'bootstrap.min.css', 'dropzone.css',
-    'owl.carousel.min.js', 'jquery.min.js', 'jquery-1.10.2.js', 'owl.carousel.min.css',
-    'owl.theme.default.min.css', 'owl.video.play.png', 'pretty.min.css', 'fontawesome.min.css',
-    'jquery_upload.min.js', 'datatables.min.js', 'dataTables', 'datatables.min.css',
-    'normalize.css',
-    'bootstrap.min.js', 'dropzone.js', 'tether.min.js', 'wow.min.js', 'font-awesome.min.css',
+const ignored_files = ['package-lock.json',
+    'font-awesome.min.js', 'font-awesome.css', 'font-awesome.min.css', 'fontawesome.min.css',
+    'bootstrap-grid.min.css', 'bootstrap.css', 'bootstrap.min.css', 'bootstrap.min.js',
+    'owl.carousel.min.js', 'owl.carousel.min.css', 'owl.theme.default.min.css',
+    'jquery.min.js', 'jquery-1.10.2.js', 'jquery_upload.min.js',
+    'datatables.min.js', 'dataTables', 'datatables.min.css', 'dropzone.js', 'dropzone.css',
+    'pretty.min.css', 'wow.min.js', 'tether.min.js', 'normalize.css',
   ],
   ignored_folders = [
     'node_modules', 'uploads', 'fonts', 'dataTables', 'ext'
   ],
   ignored_extensions = [
-    'pdf', 'txt', 'md', 'ini', 'gif', 'jpg', 'png', 'jpeg', 'ttf'
-  ],
-  allowed_extensions = [
-    'html', 'css', 'js', 'php', 'scss',
+    'pdf', 'txt', 'md', 'gif', 'jpg', 'png', 'jpeg', 'ttf'
   ];
 
-let linesOfCode = 0;
-const projectDirs = [],
-  projectFiles = [];
-let listedFilesDir = [];
-let prevCount = 0;
-let currentCount = 0;
+const projectFiles = [], // Contains every files in the project.
+  projectDirs = []; // Contains every directories in the project.
+
+let linesOfCode = 0,
+  prevCount = 0,
+  currentCount = 0;
 
 /**
  * Counts how many lines of code are there.
@@ -106,8 +103,8 @@ function start(projectDir) {
     projectDirs.forEach(dir => {
       getFiles(dir);
     });
-  }while(prevCount !== currentCount || currentCount === 0);
-  
+  } while (prevCount !== currentCount || currentCount === 0);
+
   countLines(); // counts the lines of codes after retriving all files
   /**
    * Log results
