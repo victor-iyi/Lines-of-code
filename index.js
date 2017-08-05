@@ -20,8 +20,8 @@ const ignored_files = ['package-lock.json', 'font-awesome.min.js', 'font-awesome
   ];
 
 let linesOfCode = 0;
-const directories = [],
-  files = [];
+const projectDirs = [],
+  projectFiles = [];
 let listedFilesDir = [];
 
 /**
@@ -29,11 +29,14 @@ let listedFilesDir = [];
  * And adds it to the linesOfCode variable.
  * @param {path} file 
  */
-function countLines(file) {
-  fs.readFile(file, 'utf8', function (err, data) {
-    if (err) return console.error('Error: ', err);
-    linesOfCode += data.split('\n').length;
-  });
+function countLines() {
+  console.log(projectFiles);
+  // for (let file of files) {
+  // fs.readFile(file, 'utf8', function (err, data) {
+  //   if (err) return console.error('Error: ', err);
+  //   linesOfCode += data.split('\n').length;
+  // });
+  // }
 }
 
 /**
@@ -63,17 +66,18 @@ function isDir(path) {
 
 
 /**
- * Adds file to files or directories as appropriate.
+ * Adds file to files or projectDirs as appropriate.
  * @param {path} file 
  */
 function addFile(file) {
-  if (isDir(file)) 
-    if (notInArr(file, directories))
-      directories.push(file);
-  else
-    if (notInArr(file, files)) // if file not in files
-      files.push(file);
-}
+  if (isDir(file)) {
+    if (notInArr(file, projectDirs))
+      projectDirs.push(file);
+  }
+  else 
+    if (notInArr(file, projectFiles)) // if file not in files
+      projectFiles.push(file);
+} 
 
 /**
  * Get the list of files in a directory except . files (e.g .git, .gitignore, etc)
@@ -82,15 +86,14 @@ function addFile(file) {
 function getFiles(dir) {
   fs.readdir(dir, function (err, files) {
     if (err) return console.error('ERROR geting files', err);
-    files = files.filter(f => {
+    filtered_list = files.filter(f => {
       if (notInArr(extension(f), ignored_extensions) &&
         notInArr(f, ignored_folders) && notInArr(f, ignored_files) &&
         f[0] !== '.' /* Not a dot file*/ ) return f;
     });
-    console.log(files);
-    for (let file in files) {
-      addFile(files[file]);
-    }
+    filtered_list.forEach(function(element) {
+      addFile(element);
+    });
   });
 }
 
@@ -98,3 +101,4 @@ function getFiles(dir) {
 //   if (err) return console.error(err);
 
 // });
+getFiles('./');
