@@ -20,7 +20,8 @@ const ignored_files = ['package-lock.json', 'font-awesome.min.js', 'font-awesome
 
 let linesOfCode = 0;
 const directories = [],
-  files = [];
+  files = []
+let listedFilesDir = [];
 
 /**
  * Gets the extension of a file
@@ -35,21 +36,16 @@ function extension(file) {
  * @param {path} file 
  */
 function addFile(file) {
+
   fs.stat(file, function (err, stat) {
-    if (err) {
-      console.error(err.message);
-    } else {
-      if (stat.isFile()) {
-        res = files.filter(function (f) {
-          return f === file;
-        });
-        if (res.length === 0)
-          files.push(file);
-      } else {
-        directories.push(file);
-      }
-    }
+    if (err) return console.error(err.message);
+    if (stat.isFile()) {
+      if (files.filter(f => f === file).length === 0) // if file not in files
+        files.push(file);
+    } else
+      directories.push(file);
   });
+  
 }
 
 /**
@@ -64,4 +60,16 @@ function countLines(file) {
   });
 }
 
-countLines('package.json');
+function getFiles(dir) {
+  fs.readdir(dir, function (err, files) {
+    if (err) return console.log('ERROR geting files', err);
+    files = files.filter(f => {
+      if (f[0] !== '.') return f
+    });
+    for (let file in files) {
+      addFile(files[file]);
+    }
+  });
+}
+
+getFiles('./');
