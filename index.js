@@ -1,8 +1,8 @@
 const path = require('path'),
   fs = require('fs');
 
-const projectDir = '/Users/victor/Documents/Devcrib/DigiSchools/desktop/digischools-desktop';
-const ignored_files = ['package-lock.json',
+const ignored = {
+  files: ['package-lock.json',
     'font-awesome.min.js', 'font-awesome.css', 'font-awesome.min.css', 'fontawesome.min.css',
     'bootstrap-grid.min.css', 'bootstrap.css', 'bootstrap.min.css', 'bootstrap.min.js',
     'owl.carousel.min.js', 'owl.carousel.min.css', 'owl.theme.default.min.css',
@@ -10,23 +10,25 @@ const ignored_files = ['package-lock.json',
     'datatables.min.js', 'dataTables', 'datatables.min.css', 'dropzone.js', 'dropzone.css',
     'pretty.min.css', 'wow.min.js', 'tether.min.js', 'normalize.css',
   ],
-  ignored_folders = [
+  folders: [
     'node_modules', 'uploads', 'fonts', 'dataTables', 'ext'
   ],
-  ignored_extensions = [
+  extensions: [
     'pdf', 'txt', 'md', 'gif', 'jpg', 'png', 'jpeg', 'ttf'
-  ];
-
-const projectFiles = [], // Contains every files in the project.
-  projectDirs = []; // Contains every directories in the project.
-
+  ]
+};
+const project = {
+  path: '/Users/victor/Documents/Devcrib/DigiSchools/desktop/digischools-desktop',
+  files: [],
+  dirs: [],
+};
 let linesOfCode = 0,
   prevCount = 0,
   currentCount = 0;
 // 
 // Start execution
 // 
-start(projectDir); 
+start(project.path);
 
 /**
  * Starting point.
@@ -34,8 +36,8 @@ start(projectDir);
  */
 function start(projectDir) {
   do {
-    getFiles(projectDir);
-    projectDirs.forEach(dir => {
+    getFiles(project.path);
+    project.dirs.forEach(dir => {
       getFiles(dir);
     });
   } while (prevCount !== currentCount || currentCount === 0);
@@ -45,8 +47,8 @@ function start(projectDir) {
    * Log results
    */
   console.log('====================================');
-  console.log(`\tProject Files:\t\t\t\t  ${projectFiles.length}`);
-  console.log(`\tProject Directories:\t  ${projectDirs.length}`);
+  console.log(`\tProject Files:\t\t\t\t  ${project.files.length}`);
+  console.log(`\tProject Directories:\t  ${project.dirs.length}`);
   console.log(`\tProject Lines of codes: ${linesOfCode}`);
   console.log('====================================');
 
@@ -65,7 +67,7 @@ function getFiles(dir) {
   });
   // loop through the filtered list and add files
   filtered_list.forEach(file => addFile(path.join(dir, file)));
-  currentCount = projectDirs.length;
+  currentCount = project.dirs.length;
 }
 
 /**
@@ -74,11 +76,11 @@ function getFiles(dir) {
  */
 function addFile(file) {
   if (isDir(file)) {
-    if (notInArr(file, projectDirs))
-      projectDirs.push(file);
+    if (notInArr(file, project.dirs))
+      project.dirs.push(file);
   } else
-  if (notInArr(file, projectFiles)) // if file not in files
-    projectFiles.push(file);
+  if (notInArr(file, project.files)) // if file not in files
+    project.files.push(file);
 }
 
 /**
@@ -87,7 +89,7 @@ function addFile(file) {
  * @param {path} file 
  */
 function countLines() {
-  projectFiles.forEach(function (file) {
+  project.files.forEach(file => {
     const sourceCode = fs.readFileSync(file, 'utf8');
     linesOfCode += sourceCode.split('\n').length;
   });
@@ -107,9 +109,8 @@ function extension(file) {
  * @param {string} file 
  */
 function isValidProjectFile(file) {
-  return notInArr(extension(file), ignored_extensions) &&
-    notInArr(file, ignored_folders) && notInArr(file, ignored_files) &&
-    file[0] !== '.';
+  return notInArr(extension(file), ignored.extensions) && file[0] !== '.' &&
+    notInArr(file, ignored.folders) && notInArr(file, ignored.files);
 }
 
 /**
