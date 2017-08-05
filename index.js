@@ -23,75 +23,10 @@ const projectFiles = [], // Contains every files in the project.
 let linesOfCode = 0,
   prevCount = 0,
   currentCount = 0;
-
-/**
- * Counts how many lines of code are there.
- * And adds it to the linesOfCode variable.
- * @param {path} file 
- */
-function countLines() {
-  projectFiles.forEach(function (file) {
-    const data = fs.readFileSync(file, 'utf8');
-    linesOfCode += data.split('\n').length;
-  });
-}
-
-/**
- * Gets the extension of a file
- * @param {string} file 
- */
-function extension(file) {
-  return path.extname(file).substr(1)
-}
-
-/**
- * Checks if an item is not in an array
- * @param {*} item 
- * @param {array} arr 
- */
-function notInArr(item, arr) {
-  return arr.filter(a => a === item).length === 0;
-}
-
-/**
- * Determines if a path is a file or directory
- * @param {string} path 
- */
-function isDir(path) {
-  return fs.existsSync(path) ? fs.statSync(path).isDirectory() : false;
-}
-
-/**
- * Adds file to files or projectDirs as appropriate.
- * @param {path} file 
- */
-function addFile(file) {
-  if (isDir(file)) {
-    if (notInArr(file, projectDirs))
-      projectDirs.push(file);
-  } else
-  if (notInArr(file, projectFiles)) // if file not in files
-    projectFiles.push(file);
-}
-
-/**
- * Get the list of files in a directory except . files (e.g .git, .gitignore, etc)
- * @param {string} dir 
- */
-function getFiles(dir) {
-  prevCount = currentCount;
-  files = fs.readdirSync(dir);
-  filtered_list = files.filter(f => {
-    if (notInArr(extension(f), ignored_extensions) &&
-      notInArr(f, ignored_folders) && notInArr(f, ignored_files) &&
-      f[0] !== '.' /* Not a dot file*/ ) return f;
-  });
-  // loop through the filtered list and add files
-  filtered_list.forEach(function (element) {
-    addFile(path.join(dir, element));
-  });
-  currentCount = projectDirs.length; // set current dir count to projectDirs.length
-}
+// 
+// Start execution
+// 
+start(projectDir); 
 
 /**
  * Starting point.
@@ -110,14 +45,86 @@ function start(projectDir) {
    * Log results
    */
   console.log('====================================');
-  console.log('Project Files:\t\t\t\t\t', projectFiles.length);
-  console.log('Project Directories:\t\t', projectDirs.length);
-  console.log('Project Lines of codes:\t', linesOfCode);
+  console.log(`\tProject Files:\t\t\t\t  ${projectFiles.length}`);
+  console.log(`\tProject Directories:\t  ${projectDirs.length}`);
+  console.log(`\tProject Lines of codes: ${linesOfCode}`);
   console.log('====================================');
+
 }
 
-start(projectDir);
+/**
+ * Get the list of files in a directory except . files (e.g .git, .gitignore, etc)
+ * @param {string} dir 
+ */
+function getFiles(dir) {
+  prevCount = currentCount;
+  files = fs.readdirSync(dir);
+  // filter down to only valid project files
+  filtered_list = files.filter(f => {
+    if (isValidProjectFile(f)) return f;
+  });
+  // loop through the filtered list and add files
+  filtered_list.forEach(file => addFile(path.join(dir, file)));
+  currentCount = projectDirs.length;
+}
 
-// console.log('====================================');
-// console.log(projectDirs);
-// console.log('====================================');
+/**
+ * Adds file to files or projectDirs as appropriate.
+ * @param {path} file 
+ */
+function addFile(file) {
+  if (isDir(file)) {
+    if (notInArr(file, projectDirs))
+      projectDirs.push(file);
+  } else
+  if (notInArr(file, projectFiles)) // if file not in files
+    projectFiles.push(file);
+}
+
+/**
+ * Counts how many lines of code are there.
+ * And adds it to the linesOfCode variable.
+ * @param {path} file 
+ */
+function countLines() {
+  projectFiles.forEach(function (file) {
+    const sourceCode = fs.readFileSync(file, 'utf8');
+    linesOfCode += sourceCode.split('\n').length;
+  });
+}
+
+/**
+ * Gets the extension of a file
+ * @param {string} file 
+ */
+function extension(file) {
+  return path.extname(file).substr(1)
+}
+
+/**
+ * Ensure it is a valid project file
+ * i.e it's been filtered against ignored files and dirs
+ * @param {string} file 
+ */
+function isValidProjectFile(file) {
+  return notInArr(extension(file), ignored_extensions) &&
+    notInArr(file, ignored_folders) && notInArr(file, ignored_files) &&
+    file[0] !== '.';
+}
+
+/**
+ * Checks if an item is not in an array
+ * @param {*} item 
+ * @param {array} arr 
+ */
+function notInArr(item, arr) {
+  return arr.filter(a => a === item).length === 0;
+}
+
+/**
+ * Determines if a path is a file or directory
+ * @param {string} path 
+ */
+function isDir(path) {
+  return fs.existsSync(path) ? fs.statSync(path).isDirectory() : false;
+}
