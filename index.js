@@ -1,6 +1,7 @@
 const path = require('path'),
   fs = require('fs');
 
+const projectDir = '/Users/victor/Documents/Devcrib/DigiSchools/desktop/digischools-desktop';
 const ignored_files = ['package-lock.json', 'font-awesome.min.js', 'font-awesome.css',
     'bootstrap-grid.min.css', 'bootstrap.css', 'bootstrap.min.css', 'dropzone.css',
     'owl.carousel.min.js', 'jquery.min.js', 'jquery-1.10.2.js', 'owl.carousel.min.css',
@@ -20,8 +21,20 @@ const ignored_files = ['package-lock.json', 'font-awesome.min.js', 'font-awesome
 
 let linesOfCode = 0;
 const directories = [],
-  files = []
+  files = [];
 let listedFilesDir = [];
+
+/**
+ * Counts how many lines of code are there.
+ * And adds it to the linesOfCode variable.
+ * @param {path} file 
+ */
+function countLines(file) {
+  fs.readFile(file, 'utf8', function (err, data) {
+    if (err) return console.error('Error: ', err);
+    linesOfCode += data.split('\n').length;
+  });
+}
 
 /**
  * Gets the extension of a file
@@ -41,30 +54,25 @@ function notInArr(item, arr) {
 }
 
 /**
+ * Determines if a path is a file or directory
+ * @param {string} path 
+ */
+function isDir(path) {
+  return fs.existsSync(path) ? fs.statSync(path).isDirectory() : false;
+}
+
+
+/**
  * Adds file to files or directories as appropriate.
  * @param {path} file 
  */
 function addFile(file) {
-  fs.stat(file, function (err, stat) {
-    if (err) return console.error(err.message);
-    if (stat.isFile()) {
-      if (notInArr(file, files)) // if file not in files
-        files.push(file);
-    } else
+  if (isDir(file)) 
+    if (notInArr(file, directories))
       directories.push(file);
-  });
-}
-
-/**
- * Counts how many lines of code are there.
- * And adds it to the linesOfCode variable.
- * @param {path} file 
- */
-function countLines(file) {
-  fs.readFile(file, 'utf8', function (err, data) {
-    if (err) return console.error('Error: ', err);
-    linesOfCode += data.split('\n').length;
-  });
+  else
+    if (notInArr(file, files)) // if file not in files
+      files.push(file);
 }
 
 /**
@@ -73,11 +81,11 @@ function countLines(file) {
  */
 function getFiles(dir) {
   fs.readdir(dir, function (err, files) {
-    if (err) return console.log('ERROR geting files', err);
+    if (err) return console.error('ERROR geting files', err);
     files = files.filter(f => {
       if (notInArr(extension(f), ignored_extensions) &&
         notInArr(f, ignored_folders) && notInArr(f, ignored_files) &&
-        f[0] !== '.'/* Not a dot file*/) return f;
+        f[0] !== '.' /* Not a dot file*/ ) return f;
     });
     console.log(files);
     for (let file in files) {
@@ -85,4 +93,8 @@ function getFiles(dir) {
     }
   });
 }
-getFiles('./');
+
+// fs.readdir(projectDir, (err, files) => {
+//   if (err) return console.error(err);
+
+// });
