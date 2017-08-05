@@ -96,6 +96,10 @@ function getFiles(dir) {
   currentCount = projectDirs.length; // set current dir count to projectDirs.length
 }
 
+/**
+ * Starting point.
+ * @param {string} projectDir 
+ */
 function start(projectDir) {
   do {
     getFiles(projectDir);
@@ -104,7 +108,7 @@ function start(projectDir) {
     });
   }while(prevCount !== currentCount || currentCount === 0);
   
-  countLines();
+  countLines(); // counts the lines of codes after retriving all files
   /**
    * Log results
    */
