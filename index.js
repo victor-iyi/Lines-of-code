@@ -32,20 +32,27 @@ function extension(file) {
 }
 
 /**
+ * Checks if an item is not in an array
+ * @param {*} item 
+ * @param {array} arr 
+ */
+function notInArr(item, arr) {
+  return arr.filter(a => a === item).length === 0;
+}
+
+/**
  * Adds file to files or directories as appropriate.
  * @param {path} file 
  */
 function addFile(file) {
-
   fs.stat(file, function (err, stat) {
     if (err) return console.error(err.message);
     if (stat.isFile()) {
-      if (files.filter(f => f === file).length === 0) // if file not in files
+      if (notInArr(file, files)) // if file not in files
         files.push(file);
     } else
       directories.push(file);
   });
-  
 }
 
 /**
@@ -60,16 +67,22 @@ function countLines(file) {
   });
 }
 
+/**
+ * Get the list of files in a directory except . files (e.g .git, .gitignore, etc)
+ * @param {string} dir 
+ */
 function getFiles(dir) {
   fs.readdir(dir, function (err, files) {
     if (err) return console.log('ERROR geting files', err);
     files = files.filter(f => {
-      if (f[0] !== '.') return f
+      if (notInArr(extension(f), ignored_extensions) &&
+        notInArr(f, ignored_folders) && notInArr(f, ignored_files) &&
+        f[0] !== '.'/* Not a dot file*/) return f;
     });
+    console.log(files);
     for (let file in files) {
       addFile(files[file]);
     }
   });
 }
-
 getFiles('./');
